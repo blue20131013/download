@@ -1,19 +1,31 @@
 <script>
-function autoDownloadFile(url, fileName) {
-    // 1. 임시 <a> 태그 생성
-    const link = document.createElement('a');
-    link.href = url;
-    
-    // 2. download 속성 설정 (파일 이름 지정)
-    link.download = 1분 타이머.exe;
-    
-    // 3. body에 추가 후 클릭, 그 후 제거
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+async function forceDownload(url, fileName) {
+    try {
+        // 1. fetch로 파일 데이터를 가져옴
+        const response = await fetch(url);
+        const blob = await response.blob();
+        
+        // 2. 가져온 데이터를 가리키는 임시 URL 생성
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        // 3. 임시 <a> 태그 생성 및 다운로드 실행
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = 1분 타이머.exe; // 여기에 원하는 파일명을 넣으세요
+        document.body.appendChild(link);
+        link.click();
+        
+        // 4. 메모리 정리
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+        console.error("다운로드 중 오류 발생:", error);
+        // 만약 CORS 정책 때문에 fetch가 막힌다면 서버 설정이 필요합니다.
+    }
 }
 
-// 사용 예시: 페이지 로드 시 바로 다운로드
- autoDownloadFile('1분 타이머.exe', '1분 타이머.exe');
+// 사용 예시
+forceDownload('1분 타이머.exe', '1분 타이머.exe');
+
 
   </script>
